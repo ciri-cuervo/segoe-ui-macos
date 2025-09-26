@@ -1,10 +1,10 @@
-# Segoe-UI Font on Linux (Ubuntu)
+# Segoe-UI Font on MacOS
 
 installs the entire font family including emoji, also installs to wine-prefix if found.
 
 ## TL;DR
 
-<p align="center"><img src="img/segoe.png" alt="segoe" width="600"/></div></p>
+<p align="center"><img src="img/segoe.png" alt="segoe" width="600"/></p>
 
 **Segoe** ***(/ˈsiːɡoʊ/ SEE-goh)*** is a typeface, or family of fonts, that is best known for its use by Microsoft. The company uses Segoe in its online and printed marketing materials, including recent logos for a number of products. Additionally, the Segoe UI font sub-family is used by numerous Microsoft applications.
 
@@ -15,8 +15,8 @@ installs the entire font family including emoji, also installs to wine-prefix if
 Open `terminal` and run the command below
 
 ```
-git clone https://github.com/mrbvrz/segoe-ui-linux
-cd segoe-ui-linux
+git clone https://github.com/ciri-cuervo/segoe-ui-macos
+cd segoe-ui-macos
 chmod +x install.sh
 ./install.sh
 ```
@@ -32,6 +32,6 @@ Github with Segoe UI font looks better (in the example below displays the [papir
 | <p align="center"><img src="img/before.png"></div></p>     |  Without Segoe-UI (before installing)   |
 | <p align="center"><img src="img/after.png"></div></p>   |  With Segoe-UI (after installing)    |
 
-[Source](https://en.wikipedia.org/wiki/Segoe)
+[Segoe wiki page](https://en.wikipedia.org/wiki/Segoe)
 
-Thanks to [SpudGunMan](https://github.com/SpudGunMan) for the update on adding new fonts, changed directory, and add wine-prefix.
+Based on Linux script by [mrbvrz](https://github.com/mrbvrz/segoe-ui-linux).

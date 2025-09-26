@@ -1,5 +1,8 @@
 #!/bin/bash
-# mrbvrz - https://hasansuryaman.com
+
+# Authors:
+# - original Linux script: mrbvrz - https://hasansuryaman.com
+# - MacOS script: ciri-cuervo
 
 # Colours Variables
 RESTORE='\033[0m'
@@ -21,59 +24,45 @@ WHITE='\033[01;37m'
 # Destination directory
 ROOT_UID=0
 if [ "$UID" -eq "$ROOT_UID" ]; then
-  DEST_DIR="/usr/share/fonts/Microsoft/TrueType/SegoeUI/"
+  DEST_DIR="/Library/Fonts/"
 else
-  DEST_DIR="$HOME/.local/share/fonts/Microsoft/TrueType/SegoeUI/"
+  DEST_DIR="$HOME/Library/Fonts/"
 fi
-WINE_FONT_DIR="$HOME/.wine/drive_c/windows/Fonts/"
 
 # Check Internet Conection
 function cekkoneksi(){
     echo -e "$BLUE [ * ] Checking for internet connection"
     sleep 1
-    
-    # List all network interfaces
-    interfaces=$(ip -o link show | awk -F': ' '{print $2}')
-    
-    # Flag to track internet connection status
-    internet_connected=0
-    
-    # Iterate over each network interface and check internet connectivity
-    for interface in $interfaces; do
-        echo -e "Testing internet connectivity on interface: $interface"
-        if ping -c 1 -I $interface google.com &> /dev/null; then
-            echo -e "$GREEN [ ✔ ]$BLUE Internet Connection on interface $interface ➜$GREEN CONNECTED!\n"
-            internet_connected=1
-            break  # If connected on any interface, no need to continue testing
-        else
-            echo -e "$RED [ X ]$BLUE Internet Connection on interface $interface ➜$RED OFFLINE!\n"
-        fi
-    done
-    
-    # Check overall connection status
-    if [ $internet_connected -eq 0 ]; then
-        echo -e "$RED [ X ]$BLUE Internet Connection ➜$RED OFFLINE!\n"
+
+    echo -e "GET http://www.google.com/ HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo -e "$RED [ X ]$BLUE Internet Connection ➜$RED OFFLINE!\n";
         echo -e "$RED Sorry, you really need an internet connection...."
         exit 0
+    else
+        echo -e "$GREEN [ ✔ ]$BLUE Internet Connection ➜$GREEN CONNECTED!\n";
+        sleep 1
     fi
 }
 
-function cekwget(){
-    echo -e "$BLUE [ * ] Checking for Wget"
+function cekfc(){
+    echo -e "$BLUE [ * ] Checking for fontconfig"
     sleep 1
-    which wget > /dev/null 2>&1
+
+    which fc-cache > /dev/null 2>&1
     if [ "$?" -eq "0" ]; then
-    echo -e "$GREEN [ ✔ ]$BLUE Wget ➜$GREEN INSTALLED\n"
+    echo -e "$GREEN [ ✔ ]$BLUE fontconfig ➜$GREEN INSTALLED\n"
         sleep 1
     else
-        echo -e "$RED [ X ]$BLUE Wget ➜$RED NOT INSTALLED\n"
-        continueWget
+        echo -e "$RED [ X ]$BLUE fontconfig ➜$RED NOT INSTALLED\n"
+        continueFc
     fi
 }
 
 function cekfont(){
     echo -e "$BLUE [ * ] Checking for Segoe-UI Font"
     sleep 1
+
     fc-list | grep -i "Segoe UI" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
     echo -e "$GREEN [ ✔ ]$BLUE Segoe-UI Font ➜$GREEN INSTALLED\n"
@@ -96,84 +85,53 @@ function continueFont(){
 
 function fontinstall(){
     mkdir -p "$DEST_DIR"
-    if [ -d font ]; then
-        cp font/segoeui.ttf "$DEST_DIR"/segoeui.ttf > /dev/null 2>&1 # regular
-        cp font/segoeuib.ttf "$DEST_DIR"/segoeuib.ttf > /dev/null 2>&1 # bold
-        cp font/segoeuii.ttf "$DEST_DIR"/segoeuii.ttf > /dev/null 2>&1 # italic
-        cp font/segoeuiz.ttf "$DEST_DIR"/segoeuiz.ttf > /dev/null 2>&1 # bold italic
-        cp font/segoeuil.ttf "$DEST_DIR"/segoeuil.ttf > /dev/null 2>&1 # light
-        cp font/seguili.ttf "$DEST_DIR"/seguili.ttf > /dev/null 2>&1 # light italic
-        cp font/segoeuisl.ttf "$DEST_DIR"/segoeuisl.ttf > /dev/null 2>&1 # semilight
-        cp font/seguisli.ttf "$DEST_DIR"/seguisli.ttf > /dev/null 2>&1 # semilight italic
-        cp font/seguisb.ttf "$DEST_DIR"/seguisb.ttf > /dev/null 2>&1 # semibold
-        cp font/seguisbi.ttf "$DEST_DIR"/seguisbi.ttf > /dev/null 2>&1 # semibold italic
-        cp font/seguibl.ttf "$DEST_DIR"/seguibl.ttf > /dev/null 2>&1 # bold light
-        cp font/seguibli.ttf "$DEST_DIR"/seguibli.ttf > /dev/null 2>&1 # bold light italic
-        cp font/seguiemj.ttf "$DEST_DIR"/seguiemj.ttf > /dev/null 2>&1 # emoji
-        cp font/seguisym.ttf "$DEST_DIR"/seguisym.ttf > /dev/null 2>&1 # symbol
-        cp font/seguihis.ttf "$DEST_DIR"/seguihis.ttf > /dev/null 2>&1 # historic
-
-        if [ -d $WINE_FONT_DIR ]; then
-            cp font/segoeui.ttf "$WINE_FONT_DIR"/segoeui.ttf > /dev/null 2>&1 # regular
-            cp font/segoeuib.ttf "$WINE_FONT_DIR"/segoeuib.ttf > /dev/null 2>&1 # bold
-            cp font/segoeuii.ttf "$WINE_FONT_DIR"/segoeuii.ttf > /dev/null 2>&1 # italic
-            cp font/segoeuiz.ttf "$WINE_FONT_DIR"/segoeuiz.ttf > /dev/null 2>&1 # bold italic
-            cp font/segoeuil.ttf "$WINE_FONT_DIR"/segoeuil.ttf > /dev/null 2>&1 # light
-            cp font/seguili.ttf "$WINE_FONT_DIR"/seguili.ttf > /dev/null 2>&1 # light italic
-            cp font/segoeuisl.ttf "$WINE_FONT_DIR"/segoeuisl.ttf > /dev/null 2>&1 # semilight
-            cp font/seguisli.ttf "$WINE_FONT_DIR"/seguisli.ttf > /dev/null 2>&1 # semilight italic
-            cp font/seguisb.ttf "$WINE_FONT_DIR"/seguisb.ttf > /dev/null 2>&1 # semibold
-            cp font/seguisbi.ttf "$WINE_FONT_DIR"/seguisbi.ttf > /dev/null 2>&1 # semibold italic
-            cp font/seguibl.ttf "$WINE_FONT_DIR"/seguibl.ttf > /dev/null 2>&1 # bold light
-            cp font/seguibli.ttf "$WINE_FONT_DIR"/seguibli.ttf > /dev/null 2>&1 # bold light italic
-            cp font/seguiemj.ttf "$WINE_FONT_DIR"/seguiemj.ttf > /dev/null 2>&1 # emoji
-            cp font/seguisym.ttf "$WINE_FONT_DIR"/seguisym.ttf > /dev/null 2>&1 # symbol
-            cp font/seguihis.ttf "$WINE_FONT_DIR"/seguihis.ttf > /dev/null 2>&1 # historic
-            echo -e "$GREEN\n Font installed to WINE $LBLUE'$WINE_FONT_DIR'"
-        fi
-
-    else
-        # Download font from github static link code
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeui.ttf?raw=true -O "$DEST_DIR"/segoeui.ttf > /dev/null 2>&1 # regular
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuib.ttf?raw=true -O "$DEST_DIR"/segoeuib.ttf > /dev/null 2>&1 # bold
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuii.ttf?raw=true -O "$DEST_DIR"/segoeuii.ttf > /dev/null 2>&1 # italic
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuiz.ttf?raw=true -O "$DEST_DIR"/segoeuiz.ttf > /dev/null 2>&1 # bold italic
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuil.ttf?raw=true -O "$DEST_DIR"/segoeuil.ttf > /dev/null 2>&1 # light
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguili.ttf?raw=true -O "$DEST_DIR"/seguili.ttf > /dev/null 2>&1 # light italic
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuisl.ttf?raw=true -O "$DEST_DIR"/segoeuisl.ttf > /dev/null 2>&1 # semilight
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisli.ttf?raw=true -O "$DEST_DIR"/seguisli.ttf > /dev/null 2>&1 # semilight italic
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisb.ttf?raw=true -O "$DEST_DIR"/seguisb.ttf > /dev/null 2>&1 # semibold
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true -O "$DEST_DIR"/seguisbi.ttf > /dev/null 2>&1 # semibold italic
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguibl.ttf?raw=true -O "$DEST_DIR"/seguibl.ttf > /dev/null 2>&1 # bold light
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguibli.ttf?raw=true -O "$DEST_DIR"/seguibli.ttf > /dev/null 2>&1 # bold light italic
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguiemj.ttf?raw=true -O "$DEST_DIR"/seguiemj.ttf > /dev/null 2>&1 # emoji
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisym.ttf?raw=true -O "$DEST_DIR"/seguisym.ttf > /dev/null 2>&1 # symbol
-        wget -q https://github.com/mrbvrz/segoe-ui/raw/master/font/seguihis.ttf?raw=true -O "$DEST_DIR"/seguihis.ttf > /dev/null 2>&1 # historic
-    fi
+    curl -fsSL -o "$DEST_DIR/segoeui.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeui.ttf?raw=true"     # regular
+    curl -fsSL -o "$DEST_DIR/segoeuib.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuib.ttf?raw=true"   # bold
+    curl -fsSL -o "$DEST_DIR/segoeuii.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuii.ttf?raw=true"   # italic
+    curl -fsSL -o "$DEST_DIR/segoeuiz.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuiz.ttf?raw=true"   # bold italic
+    curl -fsSL -o "$DEST_DIR/segoeuil.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuil.ttf?raw=true"   # light
+    curl -fsSL -o "$DEST_DIR/seguili.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguili.ttf?raw=true"     # light italic
+    curl -fsSL -o "$DEST_DIR/segoeuisl.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/segoeuisl.ttf?raw=true" # semilight
+    curl -fsSL -o "$DEST_DIR/seguisli.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisli.ttf?raw=true"   # semilight italic
+    curl -fsSL -o "$DEST_DIR/seguisb.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisb.ttf?raw=true"     # semibold
+    curl -fsSL -o "$DEST_DIR/seguisbi.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisbi.ttf?raw=true"   # semibold italic
+    curl -fsSL -o "$DEST_DIR/seguibl.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguibl.ttf?raw=true"     # bold light
+    curl -fsSL -o "$DEST_DIR/seguibli.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguibli.ttf?raw=true"   # bold light italic
+    curl -fsSL -o "$DEST_DIR/seguiemj.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguiemj.ttf?raw=true"   # emoji
+    curl -fsSL -o "$DEST_DIR/seguisym.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguisym.ttf?raw=true"   # symbol
+    curl -fsSL -o "$DEST_DIR/seguihis.ttf" "https://github.com/mrbvrz/segoe-ui/raw/master/font/seguihis.ttf?raw=true"   # historic
 
     fc-cache -f "$DEST_DIR"
     echo -e "$GREEN\n Font installed on $LBLUE'$DEST_DIR'"
 }
 
-function wgetinstall(){   
+function continueFc() {
+  echo -e "$LGREEN Do you want to install fontconfig via Homebrew? (y)es, (n)o :"
+  read  -p ' ' INPUT
+  case $INPUT in
+    [Yy]* ) fcinstall;;
+    [Nn]* ) end;;
+    * ) echo -e "$RED\n Sorry, try again."; continueFc;;
+  esac
+}
+
+function fcinstall(){
     sleep 1
-    sudo apt update > /dev/null 2>&1
-    sudo apt install -y wget > /dev/null 2>&1
+    which brew > /dev/null 2>&1
+    if [ "$?" -eq "0" ]; then
+    echo -e "$GREEN [ 🍺  ]$BLUE Homebrew ➜$GREEN INSTALLED\n"
+        sleep 1
+    else
+        echo -e "$RED [ X ]$BLUE Homebrew ➜$RED NOT INSTALLED\n"
+        sleep 1
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    brew install fontconfig
 }
 
 function end(){
     echo -e "$LPURPLE\n Bye..... ;)"
     exit 0
-}
-
-continueWget() {
-  echo -e "$LGREEN Do you want to install Wget? (y)es, (n)o :"
-  read  -p ' ' INPUT
-  case $INPUT in
-    [Yy]* ) wgetinstall;;
-    [Nn]* ) end;;
-    * ) echo -e "$RED\n Sorry, try again."; continueWget;;
-  esac
 }
 
 function banner(){
@@ -186,7 +144,7 @@ function banner(){
     echo -e " |___/\___|\__, |\___/ \___|       \__,_|_| |_| \___/|_| |_|\__|"
     echo -e "            __/ |                                               "
     echo -e "           |___/             $LPURPLE mrbvrz$LCYAN -$RED https://hasansuryaman.com        "
-    echo ""
+    echo -e "                             $LPURPLE ciri-cuervo"
     echo -e "$LYELLOW ---------------------------------------------------------------"
     echo ""
 }
@@ -195,7 +153,7 @@ main(){
     clear
     banner
     cekkoneksi
-    cekwget
+    cekfc
     cekfont
 }
 
